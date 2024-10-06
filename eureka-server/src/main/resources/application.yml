@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: prd-eureka-server
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    #server:
+    #wait-time-in-ms-when-sync-empty: 1000
+    #enable-self-preservation: true
+    #instance:
+    #lease-renewal-interval-in-seconds: 1

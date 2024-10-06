@@ -1,0 +1,25 @@
+server:
+  port: 8090
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+
+#gateway-service
+spring:
+  application:
+    name: micro-gateway-service
+  cloud:
+    gateway:
+      mvc:
+        routes:
+            - id: auth-service
+              uri: lb://micro-auth-service
+              predicates:
+              - Path=/auth-demo
+              filters:
+              - StripPrefix=1
+
