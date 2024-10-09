@@ -2,7 +2,7 @@ spring:
   application:
     name: micro-auth-service
   datasource:
-    url: jdbc:mysql://localhost:3306/microFullAuth
+    url: jdbc:mysql://localhost:3306/MicroFullAuth
     username: root
     password: ImNotlol12$$%%
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,4 +17,22 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 #instance:
+server:
+  port: 8081
+
+
+#paths
+request-paths:
+  paths:
+    # Restricción para rutas que terminan en '/restrict/hellCheck'
+    - uri: ".*/restrict/hellCheck$"
+      methods: ["GET"]
+      roles: ["ROLE_ADMIN","ROLE_USER"]
+    # Restricción para rutas que comienzan con '/auth/open'
+    - uri: "/auth/open/.*"
+      methods: ["GET","POST"]
+    # Restriccion para rutas que comienzan con '/user/restrict'
+    - uri: "/user/restrict/.*"
+      methods: ["GET","POST"]
+      roles: ["ROLE_ADMIN","ROLE_USER"]
 # hostname: localhost
