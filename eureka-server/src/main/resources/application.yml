@@ -1,7 +1,7 @@
 spring:
   application:
     name: prd-eureka-server
-
+#Nuevo1
 server:
   port: 8761
 
