@@ -10,7 +10,7 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     #server:
-    #wait-time-in-ms-when-sync-empty: 1000
-    #enable-self-preservation: true
+    #wait-time-in-ms-when-sync-empty: 1000 #hace que el servidor espere 1 segundo antes de sincronizar con el servidor de descubrimiento si no hay instancias registradas
+    #enable-self-preservation: true # si se establece en true, el servidor de descubrimiento no eliminará las instancias que no envían actualizaciones de estado periódicas
     #instance:
-    #lease-renewal-interval-in-seconds: 1
+    #lease-renewal-interval-in-seconds: 1 #frecuencia con la que las instancias deben enviar actualizaciones de estado al servidor de descubrimiento
