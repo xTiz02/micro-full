@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: 8080
 
 
 eureka:
@@ -14,12 +14,33 @@ spring:
     name: micro-gateway-service
   cloud:
     gateway:
-      mvc:
-        routes:
-            - id: auth-service
-              uri: lb://micro-auth-service
-              predicates:
-              - Path=/auth-demo
-              filters:
-              - StripPrefix=1
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: auth-users
+          uri: lb://micro-auth-service
+          predicates:
+          - Path=/route/user/restrict/**, /route/auth/restrict/**
+          filters:
+          #- RewritePath=/user/auth/(?<segment>.*), /$\{segment}
+          - StripPrefix=1
+          - name: AuthRequestFilter
+            args:
+              message: Request with token [ ${spring.cloud.gateway.routes[0].uri} ]
+              preLogger: true
+              postLogger: true
+        - id: auth-login
+          uri: lb://micro-auth-service
+          predicates:
+          - Path=/route/auth/open/**
+          filters:
+          - StripPrefix=1
+          - name: AuthRequestFilter
+            args:
+              message: Normal request [ ${spring.cloud.gateway.routes[1].uri} ]
+              preLogger: false
+              postLogger: true
+
+
 
