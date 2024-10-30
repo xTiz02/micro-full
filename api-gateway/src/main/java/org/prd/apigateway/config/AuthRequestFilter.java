@@ -68,8 +68,8 @@ public class AuthRequestFilter extends AbstractGatewayFilterFactory<AuthRequestF
                             return httpStatusCode.isError();
                             }, response -> response.bodyToMono(String.class)
                                         .flatMap(errorBody -> {
-                                            log.info("Authentication failed with status: {}", response.statusCode());
-                                            log.info("Error body: {}", errorBody);
+                                            log.error("Authentication failed with status: {}", response.statusCode());
+                                            log.error("Error body: {}", errorBody);
                                             // Lanzar una excepción con el estado de error y el cuerpo del mensaje
                                             return Mono.error(new CustomAuthException((HttpStatus) response.statusCode(), errorBody));
                                         })
@@ -79,13 +79,15 @@ public class AuthRequestFilter extends AbstractGatewayFilterFactory<AuthRequestF
                             log.info("Token validated successfully: {}", jwtResponse);
                             return chain.filter(exchange);
                         })
+                        //Si se produce un error durante la validación del token.
                         .onErrorResume(CustomAuthException.class, e -> {
                             log.error("Error during token validation: {}", e.getMessage());
                             return onError(exchange, e.getStatus(), e.getMessage());
                         })
+                        //Error inesperado en el servicio gateway mientras se valida el token.
                         .onErrorResume(e -> {
                             log.error("Unexpected error during token validation: {}", e.getMessage());
-                            return onError(exchange, HttpStatus.UNAUTHORIZED, "Unexpected error during token validation.");
+                            return onError(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error during token validation.");
                         });
             }
 

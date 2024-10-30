@@ -1,6 +1,7 @@
 package org.prd.authservice.config;
 
 import org.prd.authservice.model.repository.UserRepository;
+import org.prd.authservice.util.error.AuthCustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,7 @@ public class SecurityBeans {
     @Bean
     public UserDetailsService userDetailsService() {
         return (username) -> userRepository.findByUsername(username).
-                orElseThrow(() -> new RuntimeException("Username not found [\"+ username +\"]"));
+                orElseThrow(() -> new AuthCustomException("Username not found [" + username + "]"));
     }
 
     @Bean

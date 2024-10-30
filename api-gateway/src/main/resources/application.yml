@@ -21,7 +21,7 @@ spring:
         - id: auth-users
           uri: lb://micro-auth-service
           predicates:
-          - Path=/route/user/restrict/**, /route/auth/restrict/**
+          - Path=/route/user/restrict/**, /route/auth/restrict/**, /route/user/status/** , /route/auth/status/**
           filters:
           #- RewritePath=/user/auth/(?<segment>.*), /$\{segment}
           - StripPrefix=1
@@ -41,6 +41,3 @@ spring:
               message: Normal request [ ${spring.cloud.gateway.routes[1].uri} ]
               preLogger: false
               postLogger: true
-
-
-

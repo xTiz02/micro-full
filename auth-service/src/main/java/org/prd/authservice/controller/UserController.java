@@ -19,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/restrict/hellCheck")
+    @GetMapping("/status/hellCheck")
     public ResponseEntity<String> hellCheck(){
         return ResponseEntity.ok("Hello from User Controller");
     }

@@ -23,7 +23,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @GetMapping("/restrict/hellCheck")
+    @GetMapping("/status/hellCheck")
     public ResponseEntity<String> hellCheck(){
         return ResponseEntity.ok("Hello from Auth Controller");
     }

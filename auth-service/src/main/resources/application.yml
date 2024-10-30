@@ -19,16 +19,17 @@ eureka:
 #instance:
 server:
   port: 8081
-#Nuevo1
-#Nuevo2
 
 #paths
 request-paths:
   paths:
-    # Restricción para rutas que terminan en '/restrict/hellCheck'
-    - uri: ".*/restrict/hellCheck$"
+    # Restricción para rutas que terminan en '/status/hellCheck'
+    - uri: "/auth/status/hellCheck$"
       methods: ["GET"]
-      roles: ["ROLE_ADMIN","ROLE_USER"]
+      roles: ["ROLE_ADMIN"]
+    - uri: "/user/status/hellCheck$"
+      methods: [ "GET" ]
+      roles: [ "ROLE_ADMIN" ]
     # Restricción para rutas que comienzan con '/auth/open'
     - uri: "/auth/open/.*"
       methods: ["GET","POST"]
