@@ -30,6 +30,9 @@ request-paths:
     - uri: "/user/status/hellCheck$"
       methods: [ "GET" ]
       roles: [ "ROLE_ADMIN" ]
+    - uri: "/book/status/hellCheck$"
+      methods: [ "GET" ]
+      roles: [ "ROLE_ADMIN" ]
     # Restricción para rutas que comienzan con '/auth/open'
     - uri: "/auth/open/.*"
       methods: ["GET","POST"]
@@ -37,4 +40,9 @@ request-paths:
     - uri: "/user/restrict/.*"
       methods: ["GET","POST"]
       roles: ["ROLE_ADMIN","ROLE_USER"]
+    # Restriccion para rutas que comienzan con '/book/restrict'
+    - uri: "/book/restrict/.*"
+      methods: ["GET","POST"]
+      roles: ["ROLE_ADMIN"]
+
 # hostname: localhost

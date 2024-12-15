@@ -4,7 +4,7 @@ import org.prd.authservice.model.dto.JWTResponse;
 import org.prd.authservice.model.dto.LoginDto;
 import org.prd.authservice.model.dto.UriRequest;
 import org.prd.authservice.util.RouteValidator;
-import org.prd.authservice.util.error.AuthCustomException;
+import org.prd.authservice.web.exception.AuthCustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,7 +1,7 @@
 package org.prd.authservice.config;
 
 import org.prd.authservice.model.repository.UserRepository;
-import org.prd.authservice.util.error.AuthCustomException;
+import org.prd.authservice.web.exception.AuthCustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
