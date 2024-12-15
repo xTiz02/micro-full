@@ -1,4 +1,4 @@
-package org.prd.authservice.controller;
+package org.prd.authservice.web.controller;
 
 import jakarta.validation.Valid;
 import org.prd.authservice.model.dto.JWTResponse;

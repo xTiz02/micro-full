@@ -21,7 +21,7 @@ spring:
         - id: auth-users
           uri: lb://micro-auth-service
           predicates:
-          - Path=/route/user/restrict/**, /route/auth/restrict/**, /route/user/status/** , /route/auth/status/**
+          - Path=/route/user/restrict/**, /route/auth/restrict/**, /route/user/status/** , /route/auth/status/**, /route/book/status/**
           filters:
           #- RewritePath=/user/auth/(?<segment>.*), /$\{segment}
           - StripPrefix=1
@@ -38,6 +38,17 @@ spring:
           - StripPrefix=1
           - name: AuthRequestFilter
             args:
-              message: Normal request [ ${spring.cloud.gateway.routes[1].uri} ]
+              message: Global request [ ${spring.cloud.gateway.routes[1].uri} ]
               preLogger: false
+              postLogger: true
+        - id: book
+          uri: lb://micro-book-service
+          predicates:
+          - Path=/route/book/restrict/**
+          filters:
+          - StripPrefix=1
+          - name: AuthRequestFilter
+            args:
+              message: Request with token [ ${spring.cloud.gateway.routes[2].uri} ]
+              preLogger: true
               postLogger: true

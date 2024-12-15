@@ -1,4 +1,4 @@
-package org.prd.authservice.util.error;
+package org.prd.authservice.web.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

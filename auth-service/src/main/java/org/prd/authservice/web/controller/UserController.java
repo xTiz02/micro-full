@@ -1,4 +1,4 @@
-package org.prd.authservice.controller;
+package org.prd.authservice.web.controller;
 
 import org.prd.authservice.model.dto.UserDto;
 import org.prd.authservice.service.UserService;

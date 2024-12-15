@@ -1,7 +1,6 @@
-package org.prd.authservice.controller;
+package org.prd.authservice.web.exception;
 
 import org.prd.authservice.model.dto.ApiErrorDto;
-import org.prd.authservice.util.error.AuthCustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
