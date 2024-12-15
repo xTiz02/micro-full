@@ -1,10 +1,10 @@
-package org.prd.bookservice;
+package org.prd.catalogservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BookServiceApplicationTests {
+class CatalogServiceApplicationTests {
 
     @Test
     void contextLoads() {

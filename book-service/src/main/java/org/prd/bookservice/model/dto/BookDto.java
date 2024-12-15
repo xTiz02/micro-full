@@ -16,4 +16,14 @@ public record BookDto(
         @DecimalMin(value = "0.1", message = "Price must be greater than 0")
         BigDecimal price
 ) {
+        @Override
+        public String toString() {
+                return "BookDto{" +
+                        "code='" + code + '\'' +
+                        ", name='" + name + '\'' +
+                        ", description='" + description + '\'' +
+                        ", imgUri='" + imgUri + '\'' +
+                        ", price=" + price +
+                        '}';
+        }
 }
