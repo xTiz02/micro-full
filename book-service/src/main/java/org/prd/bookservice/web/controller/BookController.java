@@ -27,8 +27,9 @@ public class BookController {
     public ResponseEntity<?> findAllByPage(
             @RequestParam(defaultValue = "0", required = true) int page,
             @RequestParam(defaultValue = "3", required = true) int size,
-            @RequestParam(defaultValue = "asc", required = true) String sort,
-            @RequestParam(required = false) String field){
+            @RequestParam(defaultValue = "asc") String sort,
+            @RequestParam(required = false) String field)
+    {
         return ResponseEntity.ok(bookService.getBooks(page, size, sort, field));
     }
 

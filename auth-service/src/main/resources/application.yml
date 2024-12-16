@@ -47,9 +47,9 @@ request-paths:
     - uri: "/book/restrict/.*"
       methods: ["GET","POST","PUT","DELETE"]
       roles: ["ROLE_ADMIN"]
-    # Restriccion para rutas que comienzan con '/book/restrict'
-    - uri: "/catalog/open/.*"
-      methods: ["GET"]
+    # Restriccion para rutas que comienzan con '/order/restrict'
+    - uri: "/order/restrict/.*"
+      methods: ["GET","POST"]
       roles: ["ROLE_ADMIN","ROLE_USER"]
 
 # hostname: localhost
