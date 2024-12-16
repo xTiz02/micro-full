@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PaymentFeignService {
 
     //Responde un PaymentDto o ApiResponse en caso de error
-    @GetMapping("/process")
-    ResponseEntity<PaymentDto> processOrderPayment(@Valid @RequestBody PaymentRequest paymentRequest);
+    @GetMapping("/payment/process")
+    ResponseEntity<?> processOrderPayment(@Valid @RequestBody PaymentRequest paymentRequest);
 
 }

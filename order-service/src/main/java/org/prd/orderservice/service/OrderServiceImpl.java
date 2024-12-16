@@ -62,9 +62,9 @@ public class OrderServiceImpl implements OrderService{
 
         PaymentRequest paymentRequest = new PaymentRequest(orderEntity.getOrderNum(), orderEntity.getTotal(), userPayData);
         try {
-            ResponseEntity<PaymentDto> response = payFeign.processOrderPayment(paymentRequest);
+            ResponseEntity<?> response = payFeign.processOrderPayment(paymentRequest);
             if (response.getStatusCode().is2xxSuccessful()) {
-                PaymentDto paymentDto = response.getBody();
+                PaymentDto paymentDto = (PaymentDto) response.getBody();
                 switch (paymentDto.paymentStatus()) {
                     case SUCCESS:
                         changeStateOrder(orderCode, OrderStatus.COMPLETED);
@@ -78,7 +78,8 @@ public class OrderServiceImpl implements OrderService{
                 String message = String.format("Payment for order %s processed successfully", orderCode);
                 return new ApiResponse(message, true);
             } else {
-                throw new PaymentException("Error, payment was not processed");
+                ApiResponse apiResponse = (ApiResponse) response.getBody();
+                throw new PaymentException(apiResponse.message());
             }
         } catch (FeignException e) {
             log.error("Error in feign client: {}", e.getMessage());

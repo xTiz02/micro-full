@@ -21,7 +21,7 @@ spring:
         - id: auth-users
           uri: lb://micro-auth-service
           predicates:
-          - Path=/route/user/restrict/**, /route/auth/restrict/**, /route/user/status/** , /route/auth/status/**, /route/book/status/**, /route/catalog/status/**, /route/order/status/**
+          - Path=/route/user/restrict/**, /route/auth/restrict/**, /route/user/status/** , /route/auth/status/**
           filters:
           #- RewritePath=/user/auth/(?<segment>.*), /$\{segment}
           - StripPrefix=1
@@ -52,7 +52,7 @@ spring:
               message: Request with token [ ${spring.cloud.gateway.routes[2].uri} ]
               preLogger: true
               postLogger: true
-        - id: catalog
+        - id: catalog-open
           uri: lb://micro-catalog-service
           predicates:
             - Path=/route/catalog/open/**
@@ -63,14 +63,25 @@ spring:
                 message: Request with token [ ${spring.cloud.gateway.routes[3].uri} ]
                 preLogger: false
                 postLogger: true
-        - id: order
-          uri: lb://micro-order-service
+        - id: catalog-restrict
+          uri: lb://micro-catalog-service
           predicates:
-            - Path=/route/order/restrict/**
+            - Path=/route/status/**
           filters:
             - StripPrefix=1
             - name: AuthRequestFilter
               args:
-                message: Request with token [ ${spring.cloud.gateway.routes[3].uri} ]
+                message: Request with token [ ${spring.cloud.gateway.routes[4].uri} ]
+                preLogger: true
+                postLogger: true
+        - id: order
+          uri: lb://micro-order-service
+          predicates:
+            - Path=/route/order/restrict/** , /route/order/status/**
+          filters:
+            - StripPrefix=1
+            - name: AuthRequestFilter
+              args:
+                message: Request with token [ ${spring.cloud.gateway.routes[5].uri} ]
                 preLogger: true
                 postLogger: true

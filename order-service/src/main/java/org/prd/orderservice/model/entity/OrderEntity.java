@@ -1,9 +1,9 @@
 package org.prd.orderservice.model.entity;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.prd.orderservice.util.OrderStatus;
-import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,6 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
 @Table(name = "orders")
 public class OrderEntity {
     @Id
