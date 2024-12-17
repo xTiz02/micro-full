@@ -2,15 +2,12 @@ package org.prd.orderservice.service;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
-import org.prd.orderservice.model.dto.ApiResponse;
-import org.prd.orderservice.model.dto.OrderDto;
-import org.prd.orderservice.model.dto.PaymentDto;
-import org.prd.orderservice.model.dto.PaymentRequest;
+import org.prd.orderservice.model.dto.*;
 import org.prd.orderservice.model.entity.OrderEntity;
+import org.prd.orderservice.model.entity.OrderItem;
 import org.prd.orderservice.model.repository.OrderRepository;
 import org.prd.orderservice.util.OrderMapper;
 import org.prd.orderservice.util.OrderStatus;
-import org.prd.orderservice.util.PaymentStatus;
 import org.prd.orderservice.util.Util;
 import org.prd.orderservice.web.exception.PaymentException;
 import org.prd.orderservice.web.exception.ResourceNotFoundException;
@@ -22,8 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,21 +33,56 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepo;
     private final PaymentFeignService payFeign;
+    private final BookFeignService bookFeign;
+    private final UserFeignService userFeign;
 
-    public OrderServiceImpl(OrderRepository orderRepo, PaymentFeignService paymentFeignService) {
+    public OrderServiceImpl(OrderRepository orderRepo, PaymentFeignService paymentFeignService, BookFeignService bookFeign, UserFeignService userFeign) {
         this.orderRepo = orderRepo;
         this.payFeign = paymentFeignService;
+        this.bookFeign = bookFeign;
+        this.userFeign = userFeign;
     }
 
     @Override
     @Transactional
-    public ApiResponse createOrder(OrderDto orderDto) {
-        OrderEntity orderEntity = OrderMapper.toEntity(orderDto);
-        orderEntity.setOrderNum(UUID.randomUUID());
-        orderEntity.setStatus(OrderStatus.PENDING);
-        orderEntity = orderRepo.save(orderEntity);
-        String message = String.format("Order with code %s saved by user %s",
-                orderEntity.getOrderNum(), orderEntity.getUserUUID());
+    public ApiResponse createOrder(OrderRequest orderRequest) {
+
+        //Verificar si el usuario existe y traer sus datos de cuenta
+        ResponseEntity<?> userRes = userFeign.getUserByUUID(orderRequest.userid());
+        String email;
+        if(userRes.getStatusCode().is2xxSuccessful()){
+            UserDto userDto = (UserDto) userRes.getBody();
+            email = userDto.email();
+            //Se podría verificar si el usuario puede realizar la compra o no
+        }else{
+            ApiResponse apiResponse = (ApiResponse) userRes.getBody();
+            throw new ResourceNotFoundException(apiResponse.message());
+        }
+
+        //Verificar si los libros existen y traer su precio actual
+        ResponseEntity<?> bookRes = bookFeign.getBooksPrice(orderRequest.items().toArray(new String[0]));
+        List<BookDto> bookItems;
+        if(bookRes.getStatusCode().is2xxSuccessful()) {
+            bookItems = (List<BookDto>) bookRes.getBody();
+        }else{
+            ApiResponse apiResponse = (ApiResponse) bookRes.getBody();
+            throw new ResourceNotFoundException(apiResponse.message());
+        }
+
+        //Verificar si los libros estan disponibles y si traer precio el correcto
+        Set<OrderItem> orderItems = bookItems.stream().map(OrderMapper::toOrderItem).collect(Collectors.toSet());
+        BigDecimal total = orderItems.stream().map(OrderItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        OrderEntity order = OrderEntity.builder()
+                .orderNum(UUID.randomUUID())
+                .email(email)
+                .userUUID(orderRequest.userid())
+                .items(orderItems)
+                .total(total)
+                .status(OrderStatus.PENDING)
+                .build();
+        order = orderRepo.save(order);
+        String message = String.format("Order with code %s and %s saved by user %s",
+                order.getOrderNum(),order.getTotal().toString() ,order.getUserUUID());
         return new ApiResponse(message, true);
     }
 
@@ -60,7 +97,7 @@ public class OrderServiceImpl implements OrderService{
             throw new PaymentException("Order already processed");
         }
 
-        PaymentRequest paymentRequest = new PaymentRequest(orderEntity.getOrderNum(), orderEntity.getTotal(), userPayData);
+        PaymentRequest paymentRequest = new PaymentRequest(orderEntity.getOrderNum(), orderEntity.getTotal(),orderEntity.getEmail(), userPayData);
         try {
             ResponseEntity<?> response = payFeign.processOrderPayment(paymentRequest);
             if (response.getStatusCode().is2xxSuccessful()) {
@@ -109,12 +146,13 @@ public class OrderServiceImpl implements OrderService{
             return orderRepo.findByUserUUID(userId,pageable).map(OrderMapper::toDto);
         }else{
             Sort directionSort = Sort.by("id").ascending();
-            return orderRepo.findByUserUUID(userId,PageRequest.of(page, size, directionSort)).map(OrderMapper::toDto);
+            return orderRepo.findByUserUUID(userId,PageRequest.of(page, size, directionSort))
+                    .map(OrderMapper::toDto);
         }
     }
 
     @Override
-    public OrderDto getOrderByCode(UUID orderCode) {
+    public OrderDto getOrderByNum(UUID orderCode) {
         return orderRepo.findByOrderNum(orderCode)
                 .map(OrderMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));

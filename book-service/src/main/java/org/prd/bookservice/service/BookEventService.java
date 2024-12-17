@@ -3,13 +3,15 @@ package org.prd.bookservice.service;
 import lombok.extern.slf4j.Slf4j;
 import org.prd.bookservice.model.dto.BookEventDto;
 import org.prd.bookservice.web.exception.EventNotArriveException;
+import org.slf4j.Logger;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.events.EventException;
 
-@Slf4j
 @Service
 public class BookEventService {
+
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(BookEventService.class);
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 

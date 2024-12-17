@@ -2,23 +2,31 @@ package org.prd.bookservice.service;
 
 import org.prd.bookservice.model.dto.ApiResponse;
 import org.prd.bookservice.model.dto.BookDto;
+import org.prd.bookservice.model.dto.BookItem;
 import org.prd.bookservice.model.entity.BookEntity;
 import org.prd.bookservice.model.repository.BookRepository;
 import org.prd.bookservice.util.BookMapper;
 import org.prd.bookservice.util.Util;
 import org.prd.bookservice.web.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class BookServiceImpl implements BookService{
 
     private final BookRepository bookRep;
     private final BookEventService eventService;
+    @Value("${spring-book-topic-name}")
+    private String catalogTopic;
 
     public BookServiceImpl(BookRepository bookRepository, BookEventService eventService) {
         this.bookRep = bookRepository;
@@ -26,21 +34,24 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    @Transactional
     public ApiResponse saveBook(BookDto bookDto) {
         BookEntity bookEntity = BookMapper.toEntity(bookDto);
         bookEntity = bookRep.save(bookEntity);
         String message = String.format("Book with id %d saved", bookEntity.getId());
 
-        eventService.sendEvent("book-evt", BookMapper.toCreateEventDto(bookEntity));
+        eventService.sendEvent(catalogTopic, BookMapper.toCreateEventDto(bookEntity));
 
         return new ApiResponse(message, true);
     }
 
     @Override
+    @Transactional
     public ApiResponse updateBook(Long id, BookDto bookDto) {
-        BookEntity bookEntity = bookRep.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-        String code = bookDto.code();
-        bookEntity.setCode(bookDto.code());
+        BookEntity bookEntity = bookRep.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        String code = bookEntity.getCode();
+        //bookEntity.setCode(bookDto.code());
         bookEntity.setDescription(bookDto.description());
         bookEntity.setImgUri(bookDto.imgUri());
         bookEntity.setName(bookDto.name());
@@ -49,19 +60,21 @@ public class BookServiceImpl implements BookService{
         bookEntity = bookRep.save(bookEntity);
         String message = String.format("Book with id %d updated", bookEntity.getId());
 
-        eventService.sendEvent("book-evt", BookMapper.toUpdateEventDto(code, bookEntity));
+        eventService.sendEvent(catalogTopic, BookMapper.toUpdateEventDto(code, bookEntity));
 
         return new ApiResponse(message, true);
 
     }
 
     @Override
+    @Transactional
     public ApiResponse deleteBook(Long id) {
-        BookEntity bookEntity = bookRep.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        BookEntity bookEntity = bookRep.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         bookRep.deleteById(id);
         String message = String.format("Book with id %d deleted", id);
 
-        eventService.sendEvent("book-evt", BookMapper.toDeleteEventDto(bookEntity.getCode()));
+        eventService.sendEvent(catalogTopic, BookMapper.toDeleteEventDto(bookEntity.getCode()));
 
         return new ApiResponse(message, true);
     }
@@ -100,14 +113,27 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
+    @Transactional
     public ApiResponse changeStateBook(Long id) {
-        BookEntity bookEntity = bookRep.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        BookEntity bookEntity = bookRep.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
         boolean isActive = bookEntity.isActive();
         bookRep.changeStatus(id,!isActive);
 
-        eventService.sendEvent("book-evt", BookMapper.toEnableEventDto(bookEntity.getCode(),!isActive));
+        eventService.sendEvent(catalogTopic, BookMapper.toEnableEventDto(bookEntity.getCode(),!isActive));
 
         return new ApiResponse("Book state changed as " + (!isActive ? "Enabled":"Disabled"), true);
+    }
+
+    @Override
+    public List<BookItem> getBooksByCodes(String[] codes) {
+        List<BookItem> bookItems = new ArrayList<>();
+        for (String code : codes) {
+            BookEntity bookEntity = bookRep.findByCode(code)
+                    .orElseThrow(() -> new ResourceNotFoundException("Book with cod "+code+" not found"));
+            bookItems.add(BookMapper.toItem(bookEntity));
+        }
+        return bookItems;
     }
 
 

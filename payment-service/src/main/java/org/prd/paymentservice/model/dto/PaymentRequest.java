@@ -11,6 +11,8 @@ public record PaymentRequest(
         UUID orderId,
         @NotNull(message = "Amount is required") @DecimalMin(value = "0.1", message = "Amount must be greater than 0.1")
         BigDecimal amount,
+        @NotNull(message = "Email is required")
+        String email,
         @NotNull(message = "User data is required")
         String userPayData
 ) {

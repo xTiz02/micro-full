@@ -35,8 +35,12 @@ public class PaymentServiceImpl implements PaymentService{
         if(random % 2 == 0){
             paymentEntity.setStatus(PaymentStatus.SUCCESS);
             paymentEntity = paymentRepository.save(paymentEntity);
+            //Enviar email de confirmación
+            String email = paymentRequest.email();
         }else{
             paymentEntity.setStatus(PaymentStatus.FAILED);
+            //Enviar email de error
+            String email = paymentRequest.email();
         }
         return PaymentMapper.toDto(paymentEntity);
 

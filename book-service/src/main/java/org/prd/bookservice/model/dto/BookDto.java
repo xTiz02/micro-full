@@ -11,7 +11,6 @@ public record BookDto(
         String description,
         @NotNull(message = "Code is required")
         String code,
-        @NotNull(message = "Image URI is required")
         String imgUri,
         @DecimalMin(value = "0.1", message = "Price must be greater than 0")
         BigDecimal price

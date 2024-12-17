@@ -12,6 +12,7 @@ import java.util.Map;
 
 @Configuration
 public class KafkaTopic {
+
     @Value("${spring-book-topic-name}")
     private String prodRevertTopic;
 

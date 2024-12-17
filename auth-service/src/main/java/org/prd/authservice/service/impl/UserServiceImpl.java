@@ -8,11 +8,13 @@ import org.prd.authservice.model.repository.UserRepository;
 import org.prd.authservice.service.UserService;
 import org.prd.authservice.util.RoleEnum;
 import org.prd.authservice.util.mapper.UserMapper;
+import org.prd.authservice.web.exception.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -42,6 +44,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream()
                 .map(UserMapper::userToUserDto)
                 .toList();
+    }
+
+    @Override
+    public UserDto findByUUID(UUID id) {
+        return userRepository.findById(id)
+                .map(UserMapper::userToUserDto)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
 }

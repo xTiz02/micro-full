@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "payment-service")
+@FeignClient(name = "micro-payment-service")
 public interface PaymentFeignService {
 
     //Responde un PaymentDto o ApiResponse en caso de error

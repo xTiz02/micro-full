@@ -5,14 +5,17 @@ import org.prd.catalogservice.model.dto.BookEventDto;
 import org.prd.catalogservice.service.BookService;
 import org.prd.catalogservice.service.CatalogService;
 import org.prd.catalogservice.util.EventType;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 
-@Slf4j
+
 @Configuration
 public class BookEventListener {
+
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(BookEventListener.class);
 
     private final BookService bookServ;
 
@@ -21,7 +24,7 @@ public class BookEventListener {
     }
 
 
-    @KafkaListener(topics = {"catalog-evt"}, groupId = "book-event" , containerFactory = "listenerContainerFactory")
+    @KafkaListener(topics = {"catalog-evt"}, groupId = "book-read" , containerFactory = "listenerContainerFactory")
     public void listener(BookEventDto event){
         log.info("Received event: {}", event);
         try{

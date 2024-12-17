@@ -24,7 +24,7 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    @Transactional
+    //@Transactional
     public void createBook(BookDto bookDto) {
         BookEntity bookEntity = BookMapper.toEntity(bookDto);
         bookEntity.setActive(true);
@@ -33,7 +33,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public void updateBook(String code, BookDto bookDto) {
         BookEntity bookEntity = catRep.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
@@ -47,7 +47,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public void deleteBook(String code) {
         BookEntity bookEntity = catRep.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
@@ -56,7 +56,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
+    //@Transactional
     public void changeStateBook(String code, boolean enable) {
         BookEntity bookEntity = catRep.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));

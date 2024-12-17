@@ -1,5 +1,6 @@
 package org.prd.bookservice.web.controller;
 
+import jakarta.validation.Valid;
 import org.prd.bookservice.model.dto.ApiResponse;
 import org.prd.bookservice.model.dto.BookDto;
 import org.prd.bookservice.model.entity.BookEntity;
@@ -34,12 +35,12 @@ public class BookController {
     }
 
     @PostMapping("/restrict/save")
-    public ResponseEntity<ApiResponse> saveBook(@RequestBody BookDto book){
+    public ResponseEntity<ApiResponse> saveBook(@Valid @RequestBody BookDto book){
         return ResponseEntity.ok(bookService.saveBook(book));
     }
 
     @PutMapping("/restrict/update/{id}")
-    public ResponseEntity<ApiResponse> updateBook(@PathVariable(name = "id") Long id, @RequestBody BookDto book){
+    public ResponseEntity<ApiResponse> updateBook(@PathVariable(name = "id") Long id,@Valid @RequestBody BookDto book){
         if(bookService.existsById(id) || bookService.existsByCode(book.code())){
             throw new ResourceNotFoundException("Book not found");
         }
@@ -62,5 +63,18 @@ public class BookController {
     @GetMapping("/restrict/id/{id}")
     public ResponseEntity<BookEntity> getBookById(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(bookService.getBookById(id));
+    }
+
+    @GetMapping("/restrict/enable/{id}")
+    public ResponseEntity<ApiResponse> enableBook(@PathVariable(name = "id") Long id){
+        return ResponseEntity.ok(bookService.changeStateBook(id));
+    }
+
+    @GetMapping("/restrict/price")
+    public ResponseEntity<?> getBooksByUuid(@RequestParam(name = "codes") String[] codes){
+        if(codes.length == 0){
+            throw new ResourceNotFoundException("Books not found");
+        }
+        return ResponseEntity.ok(bookService.getBooksByCodes(codes));
     }
 }

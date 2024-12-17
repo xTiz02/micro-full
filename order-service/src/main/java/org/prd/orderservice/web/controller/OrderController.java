@@ -3,6 +3,7 @@ package org.prd.orderservice.web.controller;
 import jakarta.validation.Valid;
 import org.prd.orderservice.model.dto.ApiResponse;
 import org.prd.orderservice.model.dto.OrderDto;
+import org.prd.orderservice.model.dto.OrderRequest;
 import org.prd.orderservice.service.OrderService;
 import org.prd.orderservice.util.OrderStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class OrderController {
 
     @GetMapping("/restrict/find")
     public ResponseEntity<OrderDto> getOrderByCode(@RequestParam(required = true) UUID orden){
-        return ResponseEntity.ok(orderService.getOrderByCode(orden));
+        return ResponseEntity.ok(orderService.getOrderByNum(orden));
     }
 
     @GetMapping("/restrict/pay")
@@ -47,8 +48,8 @@ public class OrderController {
     }
 
     @PostMapping("/restrict/create")
-    public ResponseEntity<ApiResponse> createOrder(@Valid @RequestBody OrderDto orderDto){
-        return ResponseEntity.ok(orderService.createOrder(orderDto));
+    public ResponseEntity<ApiResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest){
+        return ResponseEntity.ok(orderService.createOrder(orderRequest));
     }
 
     @GetMapping("/restrict/cancel")

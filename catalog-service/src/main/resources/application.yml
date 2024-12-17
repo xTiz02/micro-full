@@ -3,7 +3,7 @@ spring:
     name: micro-catalog-service
   data:
     mongodb:
-      uri: mongodb://localhost:27017/bookCatalogdb00
+      uri: mongodb://localhost:27017/catalogdb?serverSelectionTimeoutMS=2000&retryWrites=false
 server:
   port: 8083
 

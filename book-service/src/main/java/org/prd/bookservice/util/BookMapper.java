@@ -2,6 +2,7 @@ package org.prd.bookservice.util;
 
 import org.prd.bookservice.model.dto.BookDto;
 import org.prd.bookservice.model.dto.BookEventDto;
+import org.prd.bookservice.model.dto.BookItem;
 import org.prd.bookservice.model.entity.BookEntity;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class BookMapper {
                 .name(bookDto.name())
                 .description(bookDto.description())
                 .price(bookDto.price())
+                .active(true)
                 .imgUri(bookDto.imgUri() != null ?  bookDto.imgUri() : Util.defaultUri)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -62,6 +64,14 @@ public class BookMapper {
                 null,
                 enable,
                 EventType.ENABLE
+        );
+    }
+
+    public static BookItem toItem(BookEntity bookEntity) {
+        return new BookItem(
+                bookEntity.getCode(),
+                bookEntity.getName(),
+                bookEntity.getPrice()
         );
     }
 }

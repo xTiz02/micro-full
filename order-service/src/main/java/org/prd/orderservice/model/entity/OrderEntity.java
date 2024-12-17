@@ -25,6 +25,8 @@ public class OrderEntity {
     private UUID orderNum;
     @Column(name = "user_id", nullable = false)
     private UUID userUUID;
+    @Column(name = "email", nullable = false)
+    private String email;
     @OneToMany(mappedBy = "order",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<OrderItem> items;
     @Column(name = "created_at", nullable = false, updatable = false)
