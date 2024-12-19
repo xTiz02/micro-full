@@ -1,0 +1,30 @@
+networks:
+  msvcs-book-store:
+    driver: bridge
+
+services:
+  #Imagen existente
+  config-server:
+    image: config-server-store-img
+    container_name: config-server-store
+    ports:
+      - "8888:8888"
+    networks:
+      - msvcs-book-store
+
+  #Imagen nueva
+  eureka-server:
+#    build:
+#      context: ./eureka-server # Ruta al Dockerfile
+    image: eureka-server-store-img # Nombre y etiqueta de la imagen
+    container_name: eureka-server-store
+    ports:
+      - "8761:8761"
+#    env_file:
+#      - .env
+#    environment:
+#      ACTIVE_PROFILE: ${activeProfile}
+    depends_on: # Se ejecuta después de estos servicios
+      - config-server
+    networks:
+      - msvcs-book-store
