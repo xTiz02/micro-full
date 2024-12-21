@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: micro-gateway-service
+  config:
+    import: optional:configserver:http://config-server-store:8888

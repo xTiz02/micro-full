@@ -1,9 +1,23 @@
+version: '3.9'
+
 networks:
   msvcs-book-store:
     driver: bridge
 
 services:
-  #Imagen existente
+
+  service-mysql:
+    image: mysql
+    container_name: msvc-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: MicroFullAuth
+      MYSQL_ROOT_PASSWORD: ImNotlol12msvc
+    restart: always
+    networks:
+      - msvcs-book-store
+
   config-server:
     image: config-server-store-img
     container_name: config-server-store
@@ -12,7 +26,6 @@ services:
     networks:
       - msvcs-book-store
 
-  #Imagen nueva
   eureka-server:
 #    build:
 #      context: ./eureka-server # Ruta al Dockerfile
@@ -26,5 +39,28 @@ services:
 #      ACTIVE_PROFILE: ${activeProfile}
     depends_on: # Se ejecuta después de estos servicios
       - config-server
+    networks:
+      - msvcs-book-store
+
+  gateway-server:
+    image: gateway-server-store-img
+    container_name: gateway-server-store
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - config-server
+    networks:
+      - msvcs-book-store
+
+  auth-service:
+    image: auth-service-store-img
+    container_name: auth-service-store
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+      - config-server
+      - service-mysql
     networks:
       - msvcs-book-store
