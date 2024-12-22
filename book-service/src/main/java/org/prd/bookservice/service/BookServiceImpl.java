@@ -25,7 +25,7 @@ public class BookServiceImpl implements BookService{
 
     private final BookRepository bookRep;
     private final BookEventService eventService;
-    @Value("${spring-book-topic-name}")
+    @Value("${spring.book-topic-name}")
     private String catalogTopic;
 
     public BookServiceImpl(BookRepository bookRepository, BookEventService eventService) {

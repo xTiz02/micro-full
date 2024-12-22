@@ -1,5 +1,6 @@
 package org.prd.catalogservice.web.controller;
 
+import org.prd.catalogservice.model.dto.BookDto;
 import org.prd.catalogservice.service.CatalogService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +31,11 @@ public class CatalogController {
             @RequestParam(required = false) String field
     ){
         return  ResponseEntity.ok(catalogService.getBooks(page, size, sort, field));
+    }
+
+    @GetMapping("/open/find")
+    public ResponseEntity<BookDto> findAllByPage(@RequestParam(required = true) String code){
+        return  ResponseEntity.ok(catalogService.getBookByCode(code));
     }
 
 }

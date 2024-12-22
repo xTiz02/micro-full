@@ -13,7 +13,7 @@ import java.util.Map;
 @Configuration
 public class KafkaTopic {
 
-    @Value("${spring-book-topic-name}")
+    @Value("${spring.book-topic-name}")
     private String prodRevertTopic;
 
     @Bean
@@ -26,7 +26,7 @@ public class KafkaTopic {
         configurations.put(TopicConfig.MAX_MESSAGE_BYTES_CONFIG, "1000012"); // Tamanio maximo de cada mensaje - defecto 1000000 - 1 MB
 
         NewTopic newTopic = TopicBuilder.name(prodRevertTopic)
-                .partitions(2) // Numero de particiones
+                //.partitions(2) // Numero de particiones
                 //.replicas(2) // Numero de replicas
                 .configs(configurations)
                 .build();

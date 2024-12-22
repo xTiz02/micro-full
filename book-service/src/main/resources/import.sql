@@ -1,0 +1,3 @@
+create database IF NOT EXISTS bookdb00;
+use bookdb00;
+INSERT INTO bookdb00.books (id, active, code, created_at, description, img_uri, name, price, updated_at) VALUES (9, true, 'L1005', '2024-12-17 13:41:18.096437', 'Description of Libro02 new', 'https://img.pikbest.com/templates/20241024/corporate-and-unique-premium-vector-business-book-cover-design-ai_10997970.jpg!w700wp', 'Libro02 new', 150.99, '2024-12-17 14:14:41.368155');
