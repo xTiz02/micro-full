@@ -24,11 +24,15 @@ public class PaymentServiceImpl implements PaymentService{
     @Transactional
     public PaymentDto processPayment(PaymentRequest paymentRequest) {
         UUID transactionId = UUID.randomUUID();
-        PaymentEntity paymentEntity = PaymentEntity.builder()
-                .orderNum(paymentRequest.orderId())
+        PaymentEntity paymentEntity = new PaymentEntity();
+                /*.orderNum(paymentRequest.orderId())
                 .transactionId(transactionId)
                 .price(paymentRequest.amount())
-                .build();
+                .build();*/
+        paymentEntity.setOrderNum(paymentRequest.orderId());
+        paymentEntity.setTransactionId(transactionId);
+        paymentEntity.setPrice(paymentRequest.amount());
+
 
         //Processing payment
         int random = (int) (Math.random() * 10);
@@ -39,6 +43,7 @@ public class PaymentServiceImpl implements PaymentService{
             String email = paymentRequest.email();
         }else{
             paymentEntity.setStatus(PaymentStatus.FAILED);
+            paymentEntity = paymentRepository.save(paymentEntity);
             //Enviar email de error
             String email = paymentRequest.email();
         }

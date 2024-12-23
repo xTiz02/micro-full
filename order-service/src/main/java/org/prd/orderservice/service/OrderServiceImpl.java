@@ -1,5 +1,7 @@
 package org.prd.orderservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.prd.orderservice.model.dto.*;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,43 +48,58 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public ApiResponse createOrder(OrderRequest orderRequest) {
+    public ApiResponse createOrder(OrderRequest orderRequest){
 
         //Verificar si el usuario existe y traer sus datos de cuenta
-        ResponseEntity<?> userRes = userFeign.getUserByUUID(orderRequest.userid());
-        String email;
-        if(userRes.getStatusCode().is2xxSuccessful()){
-            UserDto userDto = (UserDto) userRes.getBody();
-            email = userDto.email();
-            //Se podría verificar si el usuario puede realizar la compra o no
-        }else{
-            ApiResponse apiResponse = (ApiResponse) userRes.getBody();
-            throw new ResourceNotFoundException(apiResponse.message());
+        UserDto userDto = null;
+        try{
+            userDto = userFeign.getUserByUUID(orderRequest.userid());
+        }catch (FeignException e){
+            if(e.responseBody().isPresent()){
+                ApiResponse apiResponse = Util.getClassFromBytes(e.responseBody().get().array(), ApiResponse.class);
+                throw new ResourceNotFoundException(apiResponse.message());
+            }
         }
+
+        //Se podría verificar si el usuario puede realizar la compra o no
+        //UserDto userDto = Util.getClassFromJson(userRes.getBody(), UserDto.class);
+        String email = userDto.email();
+
 
         //Verificar si los libros existen y traer su precio actual
-        ResponseEntity<?> bookRes = bookFeign.getBooksPrice(orderRequest.items().toArray(new String[0]));
-        List<BookDto> bookItems;
-        if(bookRes.getStatusCode().is2xxSuccessful()) {
-            bookItems = (List<BookDto>) bookRes.getBody();
-        }else{
-            ApiResponse apiResponse = (ApiResponse) bookRes.getBody();
-            throw new ResourceNotFoundException(apiResponse.message());
+        String[] booksId = orderRequest.items().toArray(new String[0]);
+        List<BookDto> bookItems = null;
+        try{
+            bookItems =  bookFeign.getBooksPrice(booksId);
+        }catch (FeignException e){
+            if(e.responseBody().isPresent()){
+                ApiResponse apiResponse = Util.getClassFromBytes(e.responseBody().get().array(), ApiResponse.class);
+                throw new ResourceNotFoundException(apiResponse.message());
+            }
         }
 
-        //Verificar si los libros estan disponibles y si traer precio el correcto
-        Set<OrderItem> orderItems = bookItems.stream().map(OrderMapper::toOrderItem).collect(Collectors.toSet());
+
+
+        OrderEntity order = new OrderEntity();
+        order.setOrderNum(UUID.randomUUID());
+        order.setEmail(email);
+        order.setUserUUID(orderRequest.userid());
+        //order.setCreatedAt(LocalDateTime.now());
+        order.setStatus(OrderStatus.PENDING);
+
+        //List<BookDto> bookItems = Util.getListFromJson(bookRes.getBody(), BookDto.class);
+        OrderEntity finalOrder = order;
+        Set<OrderItem> orderItems = bookItems.stream()
+                .map(OrderMapper::toOrderItem)
+                .peek(orderItem -> orderItem.setOrder(finalOrder)) // Relación inversa aquí
+                .collect(Collectors.toSet());
         BigDecimal total = orderItems.stream().map(OrderItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-        OrderEntity order = OrderEntity.builder()
-                .orderNum(UUID.randomUUID())
-                .email(email)
-                .userUUID(orderRequest.userid())
-                .items(orderItems)
-                .total(total)
-                .status(OrderStatus.PENDING)
-                .build();
-        order = orderRepo.save(order);
-        String message = String.format("Order with code %s and %s saved by user %s",
+        finalOrder.setTotal(total);
+        finalOrder.setItems(orderItems);
+
+
+        order = orderRepo.save(finalOrder);
+        String message = String.format("Order with code %s and total %s saved by user %s",
                 order.getOrderNum(),order.getTotal().toString() ,order.getUserUUID());
         return new ApiResponse(message, true);
     }
@@ -98,30 +116,28 @@ public class OrderServiceImpl implements OrderService{
         }
 
         PaymentRequest paymentRequest = new PaymentRequest(orderEntity.getOrderNum(), orderEntity.getTotal(),orderEntity.getEmail(), userPayData);
+        PaymentDto paymentDto = null;
         try {
-            ResponseEntity<?> response = payFeign.processOrderPayment(paymentRequest);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                PaymentDto paymentDto = (PaymentDto) response.getBody();
-                switch (paymentDto.paymentStatus()) {
-                    case SUCCESS:
-                        changeStateOrder(orderCode, OrderStatus.COMPLETED);
-                        break;
-                    case FAILED:
-                        changeStateOrder(orderCode, OrderStatus.CANCELED);
-                        break;
-                    default:
-                        break;
-                }
-                String message = String.format("Payment for order %s processed successfully", orderCode);
-                return new ApiResponse(message, true);
-            } else {
-                ApiResponse apiResponse = (ApiResponse) response.getBody();
+            paymentDto = payFeign.processOrderPayment(paymentRequest);
+        } catch (FeignException e) {
+            if(e.responseBody().isPresent()){
+                ApiResponse apiResponse = Util.getClassFromBytes(e.responseBody().get().array(), ApiResponse.class);
                 throw new PaymentException(apiResponse.message());
             }
-        } catch (FeignException e) {
-            log.error("Error in feign client: {}", e.getMessage());
-            throw new PaymentException("Error invoking payment service");
         }
+
+        switch (paymentDto.paymentStatus()) {
+        case SUCCESS:
+            changeStateOrder(orderCode, OrderStatus.COMPLETED);
+            break;
+        case FAILED:
+            changeStateOrder(orderCode, OrderStatus.CANCELED);
+            break;
+        default:
+            break;
+    }
+    String message = String.format("Payment for order %s processed successfully", orderCode);
+                return new ApiResponse(message, true);
     }
 
     @Override

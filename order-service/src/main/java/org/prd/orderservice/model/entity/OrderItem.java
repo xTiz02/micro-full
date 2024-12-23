@@ -22,7 +22,7 @@ public class OrderItem {
     private String name;
     @Column(nullable = false)
     private BigDecimal price;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 }

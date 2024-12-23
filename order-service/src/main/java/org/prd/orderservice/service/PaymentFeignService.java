@@ -14,6 +14,6 @@ public interface PaymentFeignService {
 
     //Responde un PaymentDto o ApiResponse en caso de error
     @GetMapping("/payment/process")
-    ResponseEntity<?> processOrderPayment(@Valid @RequestBody PaymentRequest paymentRequest);
+    PaymentDto processOrderPayment(@Valid @RequestBody PaymentRequest paymentRequest);
 
 }

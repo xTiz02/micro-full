@@ -1,5 +1,6 @@
 package org.prd.orderservice.service;
 
+import org.prd.orderservice.model.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,5 +12,5 @@ import java.util.UUID;
 public interface UserFeignService {
 
     @GetMapping("/user/restrict/id/{uuid}")
-    ResponseEntity<?> getUserByUUID(@PathVariable(name = "uuid") UUID uuid);
+    UserDto getUserByUUID(@PathVariable(name = "uuid") UUID uuid);
 }

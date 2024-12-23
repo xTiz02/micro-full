@@ -10,7 +10,7 @@ import java.util.UUID;
 public record OrderRequest(
         @NotNull(message = "User id is required")
         UUID userid,
-        @NotNull(message = "Items is required") @NotEmpty(message = "Items is required") @NotBlank(message = "Items is required")
+        @NotNull(message = "Items is required") @NotEmpty(message = "Items is required")
         Set<String> items
 ) {
 }

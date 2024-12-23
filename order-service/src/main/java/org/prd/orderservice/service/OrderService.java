@@ -1,5 +1,6 @@
 package org.prd.orderservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.prd.orderservice.model.dto.ApiResponse;
 import org.prd.orderservice.model.dto.OrderDto;
 import org.prd.orderservice.model.dto.OrderRequest;

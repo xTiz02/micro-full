@@ -3,11 +3,14 @@ package org.prd.bookservice.web.controller;
 import jakarta.validation.Valid;
 import org.prd.bookservice.model.dto.ApiResponse;
 import org.prd.bookservice.model.dto.BookDto;
+import org.prd.bookservice.model.dto.BookItem;
 import org.prd.bookservice.model.entity.BookEntity;
 import org.prd.bookservice.service.BookService;
 import org.prd.bookservice.web.exception.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/book")
@@ -71,7 +74,7 @@ public class BookController {
     }
 
     @GetMapping("/restrict/price")
-    public ResponseEntity<?> getBooksByUuid(@RequestParam(name = "codes") String[] codes){
+    public ResponseEntity<List<BookItem>> getBooksByUuid(@RequestParam(name = "codes") String[] codes){
         if(codes.length == 0){
             throw new ResourceNotFoundException("Books not found");
         }

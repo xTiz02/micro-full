@@ -60,6 +60,22 @@ services:
     networks:
       - msvcs-book-store
 
+  service-postgres:
+    image: postgres
+    container_name: msvc-postgresql
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./initPost.sql:/docker-entrypoint-initdb.d/initPost.sql
+#    env_file:
+#      - .env
+    environment:
+      #POSTGRES_DB: msvc_hotel
+      POSTGRES_PASSWORD: ImNotlol12msvc
+    restart: always
+    networks:
+      - msvcs-book-store
+
   config-server:
     image: config-server-store-img
     container_name: config-server-store
@@ -137,5 +153,29 @@ services:
       - eureka-server
       - config-server
       - service-mongo
+    networks:
+      - msvcs-book-store
+
+  order-service:
+    image: order-service-store-img
+    container_name: order-service-store
+    ports:
+      - "8084:8084"
+    depends_on:
+      - eureka-server
+      - config-server
+      - service-postgres
+    networks:
+      - msvcs-book-store
+
+  payment-service:
+    image: payment-service-store-img
+    container_name: payment-service-store
+    ports:
+      - "8085:8085"
+    depends_on:
+      - eureka-server
+      - config-server
+      - service-mysql
     networks:
       - msvcs-book-store
