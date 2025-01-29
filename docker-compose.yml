@@ -179,3 +179,9 @@ services:
       - service-mysql
     networks:
       - msvcs-book-store
+
+  zipkin:
+    image: openzipkin/zipkin:3.0.1
+    container_name: zipkin-server
+    ports:
+      - "9411:9411"
