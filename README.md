@@ -1,3 +1,4 @@
 # Diagrama
-![image](https://github.com/user-attachments/assets/496e2fac-6326-463b-a8ad-14cb2f4553c1)
+![image](https://github.com/user-attachments/assets/7d037029-7d79-43d2-935e-b8a68a4e570c)
+
 
